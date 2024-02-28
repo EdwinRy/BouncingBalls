@@ -1,0 +1,37 @@
+{
+    "name": "bouncing-balls",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint",
+        "prettier:fix": "prettier --write \"**/*.{js,jsx,ts,tsx,html,json,css,md}\"",
+        "prettier:check": "prettier --check ."
+    },
+    "dependencies": {
+        "@react-three/drei": "^9.99.4",
+        "@react-three/fiber": "^8.15.16",
+        "@types/three": "^0.161.2",
+        "lodash": "^4.17.21",
+        "next": "14.1.0",
+        "react": "^18",
+        "react-dom": "^18",
+        "three": "^0.161.0",
+        "zustand": "^4.5.1"
+    },
+    "devDependencies": {
+        "@types/lodash": "^4.14.202",
+        "@types/node": "^20",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "autoprefixer": "^10.0.1",
+        "eslint": "^8",
+        "eslint-config-next": "14.1.0",
+        "postcss": "^8",
+        "prettier": "3.2.5",
+        "tailwindcss": "^3.3.0",
+        "typescript": "^5"
+    }
+}
