@@ -1,5 +1,7 @@
 # Bouncing Balls
 
+<img src="balls.png" />
+
 Click on a canvas to spawn a ball with a random color and velocity.  
 The balls are affected by various forces and can bounce off the walls.
 
