@@ -7,6 +7,5 @@ interface CanvasPointerStore {
 
 export const useCanvasPointerStore = create<CanvasPointerStore>((set) => ({
     pointer: { x: 0, y: 0 },
-    setPointer: (x, y) =>
-        set((state) => ({ ...state, pointer: { x, y } }), true),
+    setPointer: (x, y) => set((state) => ({ ...state, pointer: { x, y } }), true),
 }));

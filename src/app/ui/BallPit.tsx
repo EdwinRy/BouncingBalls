@@ -19,31 +19,34 @@ const Balls = ({ maxCount, ballRadiusPx, ballResolution }: BallsProps) => {
     const pointer = useCanvasPointerStore((state) => state.pointer);
 
     const simulation = useRef<DynamicBall[]>([]);
+    const colours = useRef<THREE.Color[]>([]);
     const instancesRef = useRef<THREE.InstancedMesh>(null);
 
     const [pointerInit, setPointerInit] = useState(false);
+    // When a user clicks on the canvas, a new ball is created with randomised attributes
     useEffect(() => {
         if (!pointerInit) {
             setPointerInit(true);
             return;
         }
-
         const { x, y } = screenToWorldCoords(pointer.x, pointer.y);
-        simulation.current.push(
-            new DynamicBall(
-                new THREE.Vector3(x, y, -0.001 * simulation.current.length - 1),
-                new THREE.Vector3(
-                    (Math.random() - 0.5) * 20,
-                    (Math.random() - 0.5) * 20,
-                    0
-                ),
-                new THREE.Vector3(0, -0.5, 0),
-                ballRadiusPx,
-                0.3,
-                0,
-                0.05
-            )
+
+        const position = new THREE.Vector3(x, y, -0.001 * simulation.current.length - 1);
+        const velocity = new THREE.Vector3(
+            (Math.random() - 0.5) * 20,
+            (Math.random() - 0.5) * 20,
+            0
         );
+        const acceleration = new THREE.Vector3(0, -0.5, 0);
+        const radius = ballRadiusPx;
+        const friction = 0.3;
+        const drag = 0;
+        const dampening = 0.05;
+
+        simulation.current.push(
+            new DynamicBall(position, velocity, acceleration, radius, friction, drag, dampening)
+        );
+        colours.current.push(new THREE.Color(Math.random(), Math.random(), Math.random()));
     }, [pointer]);
 
     const screenToWorldCoords = useCallback(
@@ -69,44 +72,35 @@ const Balls = ({ maxCount, ballRadiusPx, ballResolution }: BallsProps) => {
     useFrame((_, delta) => {
         if (!instancesRef.current) return;
         if (!simulation.current) return;
+        if (!colours.current) return;
 
         dt = Math.min(delta, 0.05) * timeDeltaFactor;
 
         for (let i = 0; i < simulation.current.length; i++) {
             const instance = simulation.current[i];
+            const colour = colours.current[i];
+
+            instance.position.z = -(simulation.current.length - i) - 1;
             instance.update(dt);
             instance.applyDrag();
-            instance.collideBounds(
-                -halfWidth,
-                halfWidth,
-                halfHeight,
-                -halfHeight
-            );
+            instance.collideBounds(-halfWidth, halfWidth, halfHeight, -halfHeight);
 
-            tempCircle.position.set(
-                instance.position.x,
-                instance.position.y,
-                instance.position.z
-            );
+            tempCircle.position.set(instance.position.x, instance.position.y, instance.position.z);
             tempCircle.updateMatrix();
             instancesRef.current.setMatrixAt(i, tempCircle.matrix);
+            instancesRef.current.setColorAt(i, colour);
         }
 
         instancesRef.current.instanceMatrix.needsUpdate = true;
     });
 
-    const circleGeometry = new THREE.CircleGeometry(
-        ballRadiusPx,
-        ballResolution
-    );
-    const material = new THREE.MeshBasicMaterial({ color: 'red' });
+    const circleGeometry = new THREE.CircleGeometry(ballRadiusPx, ballResolution);
+    const material = new THREE.MeshBasicMaterial({
+        color: 'white',
+        depthTest: true,
+    });
 
-    return (
-        <instancedMesh
-            ref={instancesRef}
-            args={[circleGeometry, material, maxCount]}
-        />
-    );
+    return <instancedMesh ref={instancesRef} args={[circleGeometry, material, maxCount]} />;
 };
 
 export const BallPit = () => {
@@ -121,16 +115,8 @@ export const BallPit = () => {
 
     return (
         <div className="border h-full w-full">
-            <Canvas
-                orthographic
-                camera={{ position: [0, 0, 0] }}
-                onClick={onClick}>
-                <Balls
-                    count={2}
-                    maxCount={100000}
-                    ballRadiusPx={20}
-                    ballResolution={64}
-                />
+            <Canvas orthographic camera={{ position: [0, 0, 0] }} onClick={onClick}>
+                <Balls maxCount={100000} ballRadiusPx={20} ballResolution={64} />
                 <Box args={[3, 3, 3]} position={[0, 0, 0]} />
                 <Stats />
             </Canvas>

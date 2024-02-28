@@ -1,7 +1,7 @@
 'use strict';
 
 const prettierSettings = {
-    printWidth: 80,
+    printWidth: 100,
     trailingComma: 'es5',
     bracketSpacing: true,
     endOfLine: 'auto',
