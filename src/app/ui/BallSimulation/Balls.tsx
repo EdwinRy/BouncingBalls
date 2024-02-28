@@ -2,9 +2,9 @@
 import { Box, Stats } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useCanvasPointerStore } from '../_utils/canvasPointerEvents';
+import { useCanvasPointerStore } from '../../_utils/canvasPointerEvents';
 import * as THREE from 'three';
-import { DynamicBall } from '../_utils/physics';
+import { DynamicBall } from '../../_utils/physics';
 import _ from 'lodash';
 
 interface BallsProps {
@@ -14,7 +14,7 @@ interface BallsProps {
 }
 
 const tempCircle = new THREE.Object3D();
-const Balls = ({ maxCount, ballRadiusPx, ballResolution }: BallsProps) => {
+export const Balls = ({ maxCount, ballRadiusPx, ballResolution }: BallsProps) => {
     const { viewport } = useThree();
     const pointer = useCanvasPointerStore((state) => state.pointer);
 
@@ -101,25 +101,4 @@ const Balls = ({ maxCount, ballRadiusPx, ballResolution }: BallsProps) => {
     });
 
     return <instancedMesh ref={instancesRef} args={[circleGeometry, material, maxCount]} />;
-};
-
-export const BallPit = () => {
-    const setPointer = useCanvasPointerStore((state) => state.setPointer);
-
-    const onClick = (event: any) => {
-        const rect = event.target.getBoundingClientRect();
-        const mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        const mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-        setPointer(mouseX, mouseY);
-    };
-
-    return (
-        <div className="border h-full w-full">
-            <Canvas orthographic camera={{ position: [0, 0, 0] }} onClick={onClick}>
-                <Balls maxCount={100000} ballRadiusPx={20} ballResolution={64} />
-                <Box args={[3, 3, 3]} position={[0, 0, 0]} />
-                <Stats />
-            </Canvas>
-        </div>
-    );
 };
